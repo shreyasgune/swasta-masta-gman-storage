@@ -33,9 +33,15 @@ jobs:
           [System.IO.File]::WriteAllBytes('client_secret.json', $bytes)
         shell: pwsh
 
+      - name: List Dir
+        run: dir
+        shell: pwsh
+
       - name: Build executable
         run: |
-          pyinstaller --onefile --windowed app\app.py
+          pyinstaller --onefile --windowed ^
+            --add-data "client_secret.json;." ^
+            app\app.py
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2

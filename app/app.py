@@ -5,24 +5,35 @@ import threading
 import hashlib
 import json
 import base64
+import sys
 
 from google.cloud import storage
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
-# Get the folder where the script lives
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CLIENT_SECRET_FILE = os.path.join(SCRIPT_DIR, "client_secret.json")
 
-# 🔒 Hardcoded destination
 BUCKET_NAME = "gman-archives"
 PREFIX = "Gman-Monu-Pooz-Demos"
 SCOPES = ["https://www.googleapis.com/auth/devstorage.read_write"]
 
+
+def resource_path(filename):
+    """Get absolute path to resource."""
+    if getattr(sys, 'frozen', False):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(base_path, filename)
+
+
+CLIENT_SECRET_FILE = resource_path("client_secret.json")
+
 def get_credentials():
     """Obtain OAuth credentials, refreshing or prompting login if necessary."""
-    token_path = os.path.join(SCRIPT_DIR, "token.json")
+    token_path = os.path.join(os.path.expanduser("~"), "gman_token.json")
 
     creds = None
     if os.path.exists(token_path):
@@ -82,20 +93,16 @@ def run_sync():
 
                     blob_path = f"{PREFIX}/{relative_path}".replace("\\", "/")
 
-                    # Fetch blob metadata
                     blob = bucket.get_blob(blob_path)
 
-                    # Compute local MD5 in base64
                     with open(local_path, "rb") as f:
                         local_hash = base64.b64encode(hashlib.md5(f.read()).digest()).decode()
 
-                    # Only skip if blob exists and has an md5_hash
                     if blob is not None and blob.md5_hash is not None:
                         if blob.md5_hash == local_hash:
                             log_text.insert(tk.END, f"Skipping {relative_path}, already up to date.\n")
                             continue
 
-                    # Create a new blob or overwrite if changed
                     blob = bucket.blob(blob_path)
                     log_text.insert(tk.END, f"Uploading {relative_path}...\n")
                     log_text.see(tk.END)
