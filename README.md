@@ -19,7 +19,6 @@ Yevdha Swasta: https://cloud.google.com/storage/pricing
 Azun Samzav: https://cloud.google.com/storage/pricing-examples 
 
 
-
 ## Install Gcloud
 https://cloud.google.com/sdk/docs/install
 
@@ -31,7 +30,6 @@ If you on Windows, it be right here: https://dl.google.com/dl/cloudsdk/channels/
 gcloud iam service-accounts keys create /path/to/key-file.json --iam-account=gman-service-account@<your-project-id>.iam.gserviceaccount.com
 
 gcloud projects add-iam-policy-binding <your-project-id> --member="serviceAccount:gman-service-account@<your-project-id>.iam.gserviceaccount.com" --role="roles/storage.admin"
-
 
 
 ```
@@ -298,3 +296,8 @@ Do you really want to destroy all resources?
 ## GGWP
 So there you go. Now you got cheap storage, for life.
 
+## Audio sync tool
+Go to the release section and you can download the build. But if you ain't got the perms, you gonna have to use my code to make modifications for your own bucket.
+
+![](images/backup-tool.PNG)
+![](images/done.PNG)
