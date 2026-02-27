@@ -30,7 +30,7 @@ jobs:
 
       - name: Build executable
         run: |
-          pyinstaller --onefile --windowed app.py
+          pyinstaller --onefile --windowed app\app.py
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
