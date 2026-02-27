@@ -3,3 +3,9 @@ terraform.tfstate
 .terraform.lock.hcl
 terraform.tfstate.backup
 .terraform/
+scratch 
+venv
+dist
+build
+app.spec
+app/client_secret.json
