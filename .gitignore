@@ -9,4 +9,4 @@ dist
 build
 app.spec
 app/client_secret.json
-app/app.py
+app\app.py
