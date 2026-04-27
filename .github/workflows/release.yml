@@ -38,7 +38,7 @@ jobs:
         shell: pwsh
 
       - name: Build executable
-        run: pyinstaller --onefile --windowed --add-data "client_secret.json;." app\app.py
+        run: pyinstaller --onefile --windowed --add-data "client_secret.json;." app\app_configurable.py
         
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
