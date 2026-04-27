@@ -1,4 +1,4 @@
-name: GMAN SYNC TOOL Release
+name: SGUNE Backup Tool Release
 
 on:
   workflow_dispatch:
@@ -33,16 +33,14 @@ jobs:
           [System.IO.File]::WriteAllBytes('client_secret.json', $bytes)
         shell: pwsh
 
-      - name: List Dir
-        run: dir
-        shell: pwsh
-
       - name: Build executable
-        run: pyinstaller --onefile --windowed --add-data "client_secret.json;." app\app_configurable.py
-        
+        run: pyinstaller --onefile --windowed ^
+             --name sgune_backup_tool ^
+             --add-data "client_secret.json;." app\app_configurable.py
+
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.tag }}
-          files: dist/app.exe
+          files: dist/sgune_backup_tool.exe
           overwrite_files: true

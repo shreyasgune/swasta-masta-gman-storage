@@ -8,9 +8,7 @@ import base64
 import sys
 
 from google.cloud import storage
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.oauth2.credentials import Credentials
-from google.auth.transport.requests import Request
+# Removed OAuth imports as per request to use JSON credentials only
 
 SCOPES = ["https://www.googleapis.com/auth/devstorage.read_write"]
 
@@ -76,33 +74,6 @@ def validate_config():
     
     return True
 
-def get_credentials():
-    """Obtain OAuth credentials, refreshing or prompting login if necessary."""
-    token_path = os.path.join(os.path.expanduser("~"), "gman_token.json")
-
-    creds = None
-    if os.path.exists(token_path):
-        try:
-            creds = Credentials.from_authorized_user_file(token_path, SCOPES)
-        except Exception:
-            creds = None
-
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            try:
-                creds.refresh(Request())
-            except Exception:
-                creds = None
-        
-        if not creds:
-            flow = InstalledAppFlow.from_client_secrets_file(config["credentials_file"], SCOPES)
-            creds = flow.run_local_server(port=0)
-        
-        with open(token_path, "w") as f:
-            f.write(creds.to_json())
-
-    return creds
-
 def run_sync():
     """Validate config and start sync process."""
     if not validate_config():
@@ -113,10 +84,15 @@ def run_sync():
 
     def sync():
         try:
-            os.environ.pop("GOOGLE_APPLICATION_CREDENTIALS", None)
-            creds = get_credentials()
-            client = storage.Client(credentials=creds)
-            bucket = client.bucket(config["bucket_name"])
+            # Initialize GCS client
+            try:
+                os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = config["credentials_file"]
+                client = storage.Client()
+                bucket = client.bucket(config["bucket_name"])
+            except Exception as e:
+                log_text.insert(tk.END, f"Error initializing Google Cloud Storage client: {e}\n")
+                messagebox.showerror("Error", f"Failed to initialize Google Cloud Storage client: {e}")
+                return
 
             log_text.insert(tk.END, f"Logged in successfully.\n")
             log_text.insert(tk.END, f"Bucket: {config['bucket_name']}\n")
@@ -130,17 +106,14 @@ def run_sync():
                     local_path = os.path.join(root_dir, file)
                     if not os.path.isfile(local_path):
                         continue
-                    
+
                     try:
                         relative_path = os.path.relpath(local_path, folder)
                     except ValueError as e:
                         log_text.insert(tk.END, f"Skipping {local_path}: {e}\n")
-                        log_text.see(tk.END)
-                        root.update()
                         continue
 
                     blob_path = f"{config['upload_prefix']}/{relative_path}".replace("\\", "/")
-
                     blob = bucket.get_blob(blob_path)
 
                     with open(local_path, "rb") as f:
@@ -171,6 +144,12 @@ def run_sync():
             start_button.config(state="normal")
 
     threading.Thread(target=sync, daemon=True).start()
+    """Validate config and start sync process."""
+    if not validate_config():
+        return
+
+    start_button.config(state="disabled")
+    folder = folder_entry.get()
 
 # UI Setup
 root = tk.Tk()

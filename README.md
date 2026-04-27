@@ -299,5 +299,4 @@ So there you go. Now you got cheap storage, for life.
 ## Audio sync tool
 Go to the release section and you can download the build. But if you ain't got the perms, you gonna have to use my code to make modifications for your own bucket.
 
-![](images/backup-tool.PNG)
-![](images/done.PNG)
+![](images/backup_app.PNG)
