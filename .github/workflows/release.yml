@@ -36,7 +36,7 @@ jobs:
       - name: Build executable
         run: pyinstaller --onefile --windowed ^
              --name sgune_backup_tool ^
-             --add-data "client_secret.json;." app\app_configurable.py
+             --add-data "client_secret.json;." app/app_configurable.py
 
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
